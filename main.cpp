@@ -122,8 +122,8 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    string diffuseMapPath = "rsz_11field_image.jpg";
-    string specularMapPath = "rsz_11field_image.jpg";
+    string diffuseMapPath = "resources/rsz_11field_image.jpg";
+    string specularMapPath = "resources/rsz_11field_image.jpg";
 
 
     unsigned int diffMap = loadTexture(diffuseMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
@@ -136,8 +136,8 @@ int main()
     Shader lightingShaderWithTexture("vertexShaderForPhongShadingWithTexture.vs", "fragmentShaderForPhongShadingWithTexture.fs");
     //Shader ourShader("vertexShader.vs", "fragmentShader.fs");
 
-    diffuseMapPath = "rsz_1texture-grass-field.jpg";
-    specularMapPath = "rsz_1texture-grass-field.jpg";
+    diffuseMapPath = "resources/rsz_1texture-grass-field.jpg";
+    specularMapPath = "resources/rsz_1texture-grass-field.jpg";
 
 
     diffMap = loadTexture(diffuseMapPath.c_str(), GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
@@ -145,8 +145,8 @@ int main()
     Cube cube = Cube(diffMap, specMap, 32.0f, 0.0f, 0.0f, 2.0f, 2.0f);
     
 
-    diffuseMapPath = "sky.jpg";
-    specularMapPath = "sky.jpg";
+    diffuseMapPath = "resources/sky.jpg";
+    specularMapPath = "resources/sky.jpg";
 
 
     diffMap = loadTexture(diffuseMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
