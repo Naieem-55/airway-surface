@@ -38,52 +38,52 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cube.h">
-      <Filter>Header Files\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="curve.h">
-      <Filter>Header Files\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="octagon.h">
-      <Filter>Header Files\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="sphere.h">
-      <Filter>Header Files\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_camera.h">
+    <ClInclude Include="headers\basic_camera.h">
       <Filter>Header Files\camera</Filter>
     </ClInclude>
-    <ClInclude Include="camera.h">
+    <ClInclude Include="headers\camera.h">
       <Filter>Header Files\camera</Filter>
     </ClInclude>
-    <ClInclude Include="directionLight.h">
+    <ClInclude Include="headers\directionLight.h">
       <Filter>Header Files\lights</Filter>
     </ClInclude>
-    <ClInclude Include="pointLight.h">
+    <ClInclude Include="headers\pointLight.h">
       <Filter>Header Files\lights</Filter>
     </ClInclude>
-    <ClInclude Include="spotLight.h">
+    <ClInclude Include="headers\spotLight.h">
       <Filter>Header Files\lights</Filter>
     </ClInclude>
-    <ClInclude Include="shape_maker_functions.h">
+    <ClInclude Include="headers\cube.h">
+      <Filter>Header Files\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\curve.h">
+      <Filter>Header Files\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\octagon.h">
+      <Filter>Header Files\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\sphere.h">
+      <Filter>Header Files\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\load_texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="load_texture.h">
+    <ClInclude Include="headers\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vertex_values.h">
+    <ClInclude Include="headers\shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\shape_maker_functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\vertex_values.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -91,22 +91,22 @@
     <None Include="README.md">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="fragmentShader.fs">
+    <None Include="shaders\fragmentShader.fs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="fragmentShaderForPhongShading.fs">
+    <None Include="shaders\fragmentShaderForPhongShading.fs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="fragmentShaderForPhongShadingWithTexture.fs">
+    <None Include="shaders\fragmentShaderForPhongShadingWithTexture.fs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="vertexShader.vs">
+    <None Include="shaders\vertexShader.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="vertexShaderForPhongShading.vs">
+    <None Include="shaders\vertexShaderForPhongShading.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="vertexShaderForPhongShadingWithTexture.vs">
+    <None Include="shaders\vertexShaderForPhongShadingWithTexture.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
   </ItemGroup>

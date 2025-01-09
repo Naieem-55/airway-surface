@@ -1,5 +1,5 @@
 #include <iostream>
-#include "main.h"
+#include "headers/main.h"
 
 using namespace std;
 
@@ -41,9 +41,8 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     // build and compile our shader zprogram
-    Shader lightingShader("vertexShaderForPhongShading.vs", "fragmentShaderForPhongShading.fs");
-    //Shader lightingShader("vertexShaderForGouraudShading.vs", "fragmentShaderForGouraudShading.fs");
-    Shader ourShader("vertexShader.vs", "fragmentShader.fs");
+    Shader lightingShader("shaders/vertexShaderForPhongShading.vs", "shaders/fragmentShaderForPhongShading.fs");
+    Shader ourShader("shaders/vertexShader.vs", "shaders/fragmentShader.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
 
@@ -133,7 +132,7 @@ int main()
     Cube texcube = Cube(diffMap, specMap, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    Shader lightingShaderWithTexture("vertexShaderForPhongShadingWithTexture.vs", "fragmentShaderForPhongShadingWithTexture.fs");
+    Shader lightingShaderWithTexture("shaders/vertexShaderForPhongShadingWithTexture.vs", "shaders/fragmentShaderForPhongShadingWithTexture.fs");
     //Shader ourShader("vertexShader.vs", "fragmentShader.fs");
 
     diffuseMapPath = "resources/rsz_1texture-grass-field.jpg";

@@ -1,10 +1,3 @@
-//
-//  sphere.h
-//  test
-//
-//  Created by Nazirul Hasan on 26/9/23.
-//
-
 #ifndef sphere_h
 #define sphere_h
 

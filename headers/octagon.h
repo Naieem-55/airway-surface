@@ -1,10 +1,3 @@
-//
-//  cube.h
-//  test
-//
-//  Created by Nazirul Hasan on 4/10/23.
-//
-
 #ifndef octagon_h
 #define octagon_h
 
