@@ -476,8 +476,8 @@ void drawMinar(
     float width = 6.1f;
     float length = 1.5f;*/
 
-    string diffuseMapPath = "bigben.jpg";
-    string specularMapPath = "bigben.jpg";
+    string diffuseMapPath = "resourcs/bigben.jpg";
+    string specularMapPath = "resources/bigben.jpg";
 
 
     unsigned int diffMap = loadTexture(diffuseMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
@@ -1063,8 +1063,8 @@ void drawFieldWithTexture(Shader& lightingShader, glm::mat4 alTogether)
     float width = 2.0f;
     float length = 30.0f;
 
-    string diffuseMapPath = "rsz_11texture-grass-field.jpg";
-    string specularMapPath = "rsz_11texture-grass-field.jpg";
+    string diffuseMapPath = "resources/rsz_11texture-grass-field.jpg";
+    string specularMapPath = "resources/rsz_11texture-grass-field.jpg";
 
 
     unsigned int diffMap = loadTexture(diffuseMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);

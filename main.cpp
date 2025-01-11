@@ -3,6 +3,10 @@
 
 using namespace std;
 
+void drawTajmahal(unsigned int& cubeVAO, Shader& lightingShader, glm::mat4 alTogether);
+void drawSemiDome(unsigned int& cubeVAO, BezierCurve& semiDome, Octagon& base, Octagon& mid, Shader& lightingShader, glm::mat4 alTogether);
+void drawDome(unsigned int& cubeVAO, BezierCurve& semiDome, Octagon& base, Shader& lightingShader, glm::mat4 alTogether);
+
 int main()
 {
 
@@ -14,7 +18,7 @@ int main()
 
 
     // glfw window creation
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "CSE 4208: Computer Graphics Laboratory", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Airway Surfers", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -43,49 +47,22 @@ int main()
     // build and compile our shader zprogram
     Shader lightingShader("shaders/vertexShaderForPhongShading.vs", "shaders/fragmentShaderForPhongShading.fs");
     Shader ourShader("shaders/vertexShader.vs", "shaders/fragmentShader.fs");
-
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-
-    glm::vec4 domeAmbient = glm::vec4(1.0, 1.0, 0.8, 1.0);
-    glm::vec4 domeDiffusive = glm::vec4(1.0, 1.0, 0.8, 1.0);
-    glm::vec4 domeSpecular = glm::vec4(1.0, 1.0, 0.8, 1.0);
-    float domeShiny = 32.0f;
-
-    BezierCurve dome = BezierCurve(domeVerties, 75, domeAmbient, domeDiffusive, domeSpecular, domeShiny,0);
-    BezierCurve semiDome = BezierCurve(semiDomeVerties, 54, domeAmbient, domeDiffusive, domeSpecular, domeShiny,0);
-    BezierCurve minar = BezierCurve(minarVertices, 60, domeAmbient, domeDiffusive, domeSpecular, domeShiny,0);
-
-    glm::vec4 cylinderAmbient = glm::vec4(0.1, 0.9, 0.1, 1.0);
-    glm::vec4 cylinderDiffusive = glm::vec4(0.1, 0.9, 0.1, 1.0);
-    glm::vec4 cylinderSpecular = glm::vec4(0.0, 0.9, 0.0, 1.0);
-    float cylinderShiny = 12.0f;
-    BezierCurve greencylinder = BezierCurve(solinoidVertices, 66, cylinderAmbient, cylinderDiffusive, cylinderSpecular, cylinderShiny,0);
-
-    cylinderAmbient = glm::vec4(0.7, 0.3, 0.3, 1.0);
-    cylinderDiffusive = glm::vec4(0.7, 0.3, 0.3, 1.0);
-    cylinderSpecular = glm::vec4(0.7, 0.3, 0.3, 1.0);
-    BezierCurve greycylinder = BezierCurve(solinoidVertices, 66, cylinderAmbient, cylinderDiffusive, cylinderSpecular, cylinderShiny,0);
-    
-    glm::vec4 treeAmbient = glm::vec4(0.0, 0.9, 0.0, 1.0);
-    glm::vec4 treeDiffusive = glm::vec4(0.0, 0.9, 0.0, 1.0);
-    glm::vec4 treeSpecular = glm::vec4(0.0, 1.0, 0.0, 1.0);
-    float treeShiny = 12.0f;
-    BezierCurve tree = BezierCurve(treeVertices, 138, treeAmbient, treeDiffusive, treeSpecular, treeShiny, 0);
+    Shader lightingShaderWithTexture("shaders/vertexShaderForPhongShadingWithTexture.vs", "shaders/fragmentShaderForPhongShadingWithTexture.fs");
 
 
-    BezierCurve dome2 = BezierCurve(domeVerties, 75, domeAmbient, domeDiffusive, domeSpecular, domeShiny, 1);
+    float v1[] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
 
-    glm::vec4 octAmbient = glm::vec4(0.5, 0.5, 0.5, 1.0);
-    glm::vec4 octDiffusive = glm::vec4(0.5, 0.5, 0.5, 1.0);
-    glm::vec4 octSpecular = glm::vec4(0.7, 0.7, 0.7, 1.0);
-    float octShiny = 32.0f;
 
-    glm::vec4 octWhite = glm::vec4(0.7, 0.7, 0.7, 1.0);
-    glm::vec4 octGrey = glm::vec4(0.7, 0.3, 0.3, 1.0);
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(v1), v1, GL_STATIC_DRAW);
 
-    Octagon oct1 = Octagon(octAmbient, octDiffusive, octSpecular, octShiny);
-    Octagon oct2 = Octagon(octWhite, octWhite, octWhite, octShiny);
-    Octagon oct3 = Octagon(octGrey, octGrey, octGrey, octShiny);
+    cout << "VBO value: " << vbo << endl;
+
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+
 
 
     unsigned int cubeVAO, cubeVBO, cubeEBO;
@@ -94,11 +71,10 @@ int main()
     glGenBuffers(1, &cubeEBO);
 
     glBindVertexArray(cubeVAO);
-
     glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW);
 
 
@@ -117,45 +93,34 @@ int main()
 
     glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
-    // note that we update the lamp's position attribute's stride to reflect the updated buffer data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    string diffuseMapPath = "resources/rsz_11field_image.jpg";
-    string specularMapPath = "resources/rsz_11field_image.jpg";
-
-
-    unsigned int diffMap = loadTexture(diffuseMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-    unsigned int specMap = loadTexture(specularMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-    Sphere sphere = Sphere(diffMap,specMap,0,0,2,1);
-
-    Cube texcube = Cube(diffMap, specMap, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    Shader lightingShaderWithTexture("shaders/vertexShaderForPhongShadingWithTexture.vs", "shaders/fragmentShaderForPhongShadingWithTexture.fs");
-    //Shader ourShader("vertexShader.vs", "fragmentShader.fs");
-
-    diffuseMapPath = "resources/rsz_1texture-grass-field.jpg";
-    specularMapPath = "resources/rsz_1texture-grass-field.jpg";
-
-
-    diffMap = loadTexture(diffuseMapPath.c_str(), GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-    specMap = loadTexture(specularMapPath.c_str(), GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-    Cube cube = Cube(diffMap, specMap, 32.0f, 0.0f, 0.0f, 2.0f, 2.0f);
     
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // note that we update the lamp's position attribute's stride to reflect the updated buffer data
+    glEnableVertexAttribArray(0); 
 
-    diffuseMapPath = "resources/sky.jpg";
-    specularMapPath = "resources/sky.jpg";
+    int loop_timer = 0;
 
 
-    diffMap = loadTexture(diffuseMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-    specMap = loadTexture(specularMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-    Cube texcube2 = Cube(diffMap, specMap, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+    //Dome
+    glm::vec4 domeAmbient = glm::vec4(1.0, 1.0, 0.8, 1.0);
+    glm::vec4 domeDiffusive = glm::vec4(1.0, 1.0, 0.8, 1.0);
+    glm::vec4 domeSpecular = glm::vec4(1.0, 1.0, 0.8, 1.0);
+    float domeShiny = 32.0f;
 
-    
+    BezierCurve dome = BezierCurve(domeVerties, 75, domeAmbient, domeDiffusive, domeSpecular, domeShiny, 0);
+    BezierCurve semiDome = BezierCurve(semiDomeVerties, 54, domeAmbient, domeDiffusive, domeSpecular, domeShiny, 0);
+  
 
-    //ourShader.use();
-    //lightingShader.use();
+    glm::vec4 octAmbient = glm::vec4(0.5, 0.5, 0.5, 1.0);
+    glm::vec4 octDiffusive = glm::vec4(0.5, 0.5, 0.5, 1.0);
+    glm::vec4 octSpecular = glm::vec4(0.7, 0.7, 0.7, 1.0);
+    float octShiny = 32.0f;
+
+    glm::vec4 octWhite = glm::vec4(0.7, 0.7, 0.7, 1.0);
+    glm::vec4 octGrey = glm::vec4(0.7, 0.3, 0.3, 1.0);
+
+    Octagon oct1 = Octagon(octAmbient, octDiffusive, octSpecular, octShiny);
+    Octagon oct2 = Octagon(octWhite, octWhite, octWhite, octShiny);
+    Octagon oct3 = Octagon(octGrey, octGrey, octGrey, octShiny);
 
     // render loop
     // -----------
@@ -200,86 +165,10 @@ int main()
         // Modelling Transformation
         glm::mat4 identityMatrix = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         glm::mat4 translate, rotate, revtranslate, alTogether, next, model, scale;
-        //translateMatrix = glm::translate(identityMatrix, glm::vec3(10, 20, 10));
-        //rotateXMatrix = glm::rotate(identityMatrix, glm::radians(rotateAngle_X), glm::vec3(1.0f, 0.0f, 0.0f));
-        //rotateYMatrix = glm::rotate(identityMatrix, glm::radians(rotateAngle_Y), glm::vec3(0.0f, 1.0f, 0.0f));
-        //rotateZMatrix = glm::rotate(identityMatrix, glm::radians(rotateAngle_Z), glm::vec3(0.0f, 0.0f, 1.0f));
-        //scaleMatrix = glm::scale(identityMatrix, glm::vec3(0.1, 0.1, 0.1));
         model =  identityMatrix;
         lightingShader.setMat4("model", model);
 
-
-        //scale = glm::scale(identityMatrix, glm::vec3(4.0, 4.0, 4.0));
-        //dome2.drawBezierCurve(lightingShader, scale);
-
-        model = identityMatrix;
-        //drawLake(cubeVAO, lightingShader, model);
-        drawField(cubeVAO, lightingShader, model);
-        drawFloor(cubeVAO, lightingShader, model);
-
-        rotate = glm::rotate(identityMatrix, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        translate = glm::translate(identityMatrix, glm::vec3(0.0, 0.0, 133.0));
-        model = translate * rotate;
-        drawField(cubeVAO, lightingShader, model);
-
-         
-
-        //Tajmahal design
-        translate = glm::translate(identityMatrix, glm::vec3(0.0, 2.0, -8.0));
-        scale = glm::scale(identityMatrix, glm::vec3(1.0, 1.3, 1.0));
-        next = scale * translate;
-        //drawTajmahal(cubeVAO, lightingShader, next);
-        //central dome
-        translate = glm::translate(identityMatrix, glm::vec3(-3.5f, 12.0f, -24.5f));
-        scale = glm::scale(identityMatrix, glm::vec3(1.0, 1.0, 1.0));
-        model = next * translate * scale;
-        //drawDome(cubeVAO, dome, oct2, lightingShader, model);
-        //SDFL
-        translate = glm::translate(identityMatrix, glm::vec3(-10.0f, 12.0f, -16.0f));
-        scale = glm::scale(identityMatrix, glm::vec3(1.5, 1.5, 1.5));
-        model = next * translate * scale;
-        //drawSemiDome(cubeVAO, semiDome, oct2, oct2, lightingShader, model);
-        //SDFR
-        translate = glm::translate(identityMatrix, glm::vec3(5.0f, 12.0f, -16.0f));
-        scale = glm::scale(identityMatrix, glm::vec3(1.5, 1.5, 1.5));
-        model = next * translate * scale;
-        //drawSemiDome(cubeVAO, semiDome, oct2, oct2, lightingShader, model);
-        //SDBL
-        translate = glm::translate(identityMatrix, glm::vec3(-10.0f, 12.0f, -31.5f));
-        scale = glm::scale(identityMatrix, glm::vec3(1.5, 1.5, 1.5));
-        model = next * translate * scale;
-        //drawSemiDome(cubeVAO, semiDome, oct2, oct2, lightingShader, model);
-        //SDBR
-        translate = glm::translate(identityMatrix, glm::vec3(5.0f, 12.0f, -31.5f));
-        scale = glm::scale(identityMatrix, glm::vec3(1.5, 1.5, 1.5));
-        model = next * translate * scale;
-        //drawSemiDome(cubeVAO, semiDome, oct2, oct2, lightingShader, model);
-
-
-        //Minar right
-        translate = glm::translate(identityMatrix, glm::vec3(1.5, 0.0, -2.5));
-        model = next * translate;
-        drawMinar(cubeVAO, minar, semiDome, oct3, oct2, lightingShader, model);
-        //Minar left
-        translate = glm::translate(identityMatrix, glm::vec3(-22.5, 0.0, -2.5));
-        model = next * translate;
-        //drawMinar(cubeVAO, minar, semiDome, oct3, oct2, lightingShader, model);
-        //Minar right back
-        translate = glm::translate(identityMatrix, glm::vec3(17.5, 0.0, -42.5));
-        model = next * translate;
-        //drawMinar(cubeVAO, minar, semiDome, oct3, oct2, lightingShader, model);
-        //Minar left back
-        translate = glm::translate(identityMatrix, glm::vec3(-22.5, 0.0, -42.5));
-        model = next * translate;
-        //drawMinar(cubeVAO, minar, semiDome, oct3, oct2, lightingShader, model);
-
-        //drawNarrowMinarTogether(cubeVAO, minar, semiDome, oct3, oct2, lightingShader, next);
         
-
-
-        model = identityMatrix;
-       
-
         // we now draw as many light bulbs as we have point lights.
         glBindVertexArray(lightCubeVAO);
         for (unsigned int i = 0; i < 4; i++)
@@ -308,7 +197,6 @@ int main()
 
         lightingShaderWithTexture.use();
 
-        
 
         pointlight1.setUpPointLight(lightingShaderWithTexture);
         pointlight2.setUpPointLight(lightingShaderWithTexture);
@@ -320,73 +208,39 @@ int main()
         moonlight.setUpDirectionalLight(lightingShaderWithTexture);
         daylight.setUpDirectionalLight(lightingShaderWithTexture);
 
-
         
         model = identityMatrix;
         lightingShaderWithTexture.setMat4("model", model);
-        //drawFieldWithTexture(lightingShaderWithTexture, model);
-
 
         translate = glm::translate(identityMatrix, glm::vec3(0.0f, 0.0f, 30.0f));
         scale = glm::scale(identityMatrix, glm::vec3(90.0f, 90.0f, 90.0f));
         rotate = glm::rotate(identityMatrix, glm::radians(20.0f * 0.05f), glm::vec3(0.0f, 1.0f, 0.0f));
         model = translate * scale;
-        //sphere.drawSphereWithTexture(lightingShaderWithTexture, model);;
-
-       
 
 
 
 
-        translate = glm::translate(identityMatrix, glm::vec3(-57.0f, -5.0f, -57.0f));
-        scale = glm::scale(identityMatrix, glm::vec3(114.0f, 114.0f, 1.0f));
-        model = translate * scale;
-        texcube.drawCubeWithTexture(lightingShaderWithTexture, model);
+        ////Map creation and deletion logic.
+        //loop_timer++;
+        //if (loop_timer % 10000 == 0){
+        //    map_translate_position[0] += 0.0f;
+        //    map_translate_position[1] += 0.0f;
+        //    map_translate_position[2] += 1.0f;
 
-        translate = glm::translate(identityMatrix, glm::vec3(57.0f, -5.0f, -57.0f));
-        scale = glm::scale(identityMatrix, glm::vec3(1.0f, 114.0f, 114.0f));
-        model = translate * scale;
-        texcube.drawCubeWithTexture(lightingShaderWithTexture, model);
+        //    cout << "New position: " << map_translate_position[0] << endl;
+        //}
+
+        create_map(glm::vec3(0.0f, 0.0f, 0.0f), lightingShaderWithTexture);
+        //create_map(glm::vec3(0.0f, 0.0f, 1000.0f), lightingShaderWithTexture);
         
-        translate = glm::translate(identityMatrix, glm::vec3(-57.0f, -5.0f, -57.0f));
-        scale = glm::scale(identityMatrix, glm::vec3(1.0f, 114.0f, 114.0f));
-        model = translate * scale;
-        texcube.drawCubeWithTexture(lightingShaderWithTexture, model);
-        
-        translate = glm::translate(identityMatrix, glm::vec3(57.0f, -5.0f, -57.0f));
-        scale = glm::scale(identityMatrix, glm::vec3(1.0f, 114.0f, 114.0f));
-        model = translate * scale;
-        texcube.drawCubeWithTexture(lightingShaderWithTexture, model);
 
-        translate = glm::translate(identityMatrix, glm::vec3(-57.0f, -5.0f, 57.0f));
-        scale = glm::scale(identityMatrix, glm::vec3(1.0f, 114.0f, 114.0f));
-        model = translate * scale;
-        texcube.drawCubeWithTexture(lightingShaderWithTexture, model);
-
-        translate = glm::translate(identityMatrix, glm::vec3(57.0f, -5.0f, 57.0f));
-        scale = glm::scale(identityMatrix, glm::vec3(1.0f, 114.0f, 114.0f));
-        model = translate * scale;
-        texcube.drawCubeWithTexture(lightingShaderWithTexture, model);
-
-        translate = glm::translate(identityMatrix, glm::vec3(-57.0f, -5.0f, 138.0f));
-        scale = glm::scale(identityMatrix, glm::vec3(114.0f, 114.0f, 1.0f));
-        model = translate * scale;
-        texcube.drawCubeWithTexture(lightingShaderWithTexture, model);
-
-        translate = glm::translate(identityMatrix, glm::vec3(-57.0f, 100.0f, -57.0f));
-        scale = glm::scale(identityMatrix, glm::vec3(190.0f, 1.0f, 200.0f));
-        model = translate * scale;
-        texcube2.drawCubeWithTexture(lightingShaderWithTexture, model);
 
         glm::mat4 modelMatrixForContainer = glm::mat4(1.0f);
         modelMatrixForContainer = glm::translate(identityMatrix, glm::vec3(0.0f, 3.0f, 2.0f));
-        //cube.drawCubeWithTexture(lightingShaderWithTexture, modelMatrixForContainer);
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
+       
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
 
     glDeleteVertexArrays(1, &cubeVAO);
     glDeleteVertexArrays(1, &lightCubeVAO);
@@ -397,3 +251,86 @@ int main()
     return 0;
 }
 
+
+
+//void drawDome(unsigned int& cubeVAO, BezierCurve& Dome, Octagon& base, Shader& lightingShader, glm::mat4 alTogether)
+//{
+//    glm::mat4 model = glm::mat4(1.0f);
+//    glm::mat4 translate = glm::mat4(1.0f);
+//    glm::mat4 identityMatrix = glm::mat4(1.0f);
+//    glm::mat4 scale = glm::mat4(1.0f);
+//    glm::mat4 rotate = glm::mat4(1.0f);
+//
+//
+//
+//    scale = glm::scale(identityMatrix, glm::vec3(4.0, 5.0, 4.0));
+//    translate = glm::translate(identityMatrix, glm::vec3(3.5, 1.0, 3.5));
+//    model = alTogether * translate * scale;
+//    Dome.drawBezierCurve(lightingShader, model);
+//
+//    scale = glm::scale(identityMatrix, glm::vec3(3.0, 3.0, 3.0));
+//    model = alTogether * scale;
+//    base.drawOctagonWithMaterialisticProperty(lightingShader, model);
+//
+//}
+
+//void drawSemiDome(unsigned int& cubeVAO, BezierCurve& spire, Octagon& base, Octagon& mid, Shader& lightingShader, glm::mat4 alTogether) {
+//    glm::mat4 model = glm::mat4(1.0f);
+//    glm::mat4 translate = glm::mat4(1.0f);
+//    glm::mat4 identityMatrix = glm::mat4(1.0f);
+//    glm::mat4 scale = glm::mat4(1.0f);
+//    glm::mat4 rotate = glm::mat4(1.0f);
+//
+//    // Scale and translate the spire (narrow top)
+//    scale = glm::scale(identityMatrix, glm::vec3(2.2, 4.5, 0.5));  // Smaller width for the spire
+//    translate = glm::translate(identityMatrix, glm::vec3(1.8, -2.0, 1.8));  // Move the spire to the top
+//    model = alTogether * translate * scale;
+//    spire.drawBezierCurve(lightingShader, model);
+//
+//    // Scale and translate the base (larger octagon)
+//    scale = glm::scale(identityMatrix, glm::vec3(2.0, 0.5, 2.0));  // Broader base
+//    translate = glm::translate(identityMatrix, glm::vec3(-0.8, 0.5, 1.8));  // Position the base
+//    model = alTogether * translate * scale;
+//    base.drawOctagonWithMaterialisticProperty(lightingShader, model);
+//
+//    // Scale and translate the middle section (Mid-tier)
+//    scale = glm::scale(identityMatrix, glm::vec3(1.8, 0.3, 1.8));  // Slightly thinner middle section
+//    translate = glm::translate(identityMatrix, glm::vec3(-0.5, 2.5, 0.0));  // Positioned in the middle of the tower
+//    model = alTogether * translate * scale;
+//    mid.drawOctagonWithMaterialisticProperty(lightingShader, model);
+//
+//    // Adding cube shapes for detailing at the base (like columns or smaller structures)
+//    scale = glm::scale(identityMatrix, glm::vec3(0.3, 1.5, 0.3));  // Small supporting cubes
+//    translate = glm::translate(identityMatrix, glm::vec3(1.1, 1.0, 0.1));  // Positions for detailing
+//    model = alTogether * translate * scale;
+//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
+//
+//    translate = glm::translate(identityMatrix, glm::vec3(2.2, 1.0, 0.1));
+//    model = alTogether * translate * scale;
+//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
+//
+//    translate = glm::translate(identityMatrix, glm::vec3(3.2, 1.0, 1.1));
+//    model = alTogether * translate * scale;
+//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
+//
+//    translate = glm::translate(identityMatrix, glm::vec3(3.2, 1.0, 2.2));
+//    model = alTogether * translate * scale;
+//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
+//
+//    translate = glm::translate(identityMatrix, glm::vec3(2.2, 1.0, 3.2));
+//    model = alTogether * translate * scale;
+//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
+//
+//    translate = glm::translate(identityMatrix, glm::vec3(1.1, 1.0, 3.2));
+//    model = alTogether * translate * scale;
+//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
+//
+//    translate = glm::translate(identityMatrix, glm::vec3(0.1, 1.0, 1.1));
+//    model = alTogether * translate * scale;
+//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
+//
+//    translate = glm::translate(identityMatrix, glm::vec3(0.1, 1.0, 2.2));
+//    model = alTogether * translate * scale;
+//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
+//}
+//

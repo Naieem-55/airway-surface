@@ -22,23 +22,22 @@
 
 #include "shape_maker_functions.h"
 #include "vertex_values.h"
+#include "map_chunk.h"
 
 // settings
 const unsigned int SCR_WIDTH = 1200;
 const unsigned int SCR_HEIGHT = 1000;
 
-
-
 // camera
-Camera camera(glm::vec3(0.0f, 35.0f, 135.0f));
+Camera camera(glm::vec3(100.0f, 35.0f, 298.0f));
+//Camera camera(glm::vec3(0.0f, 35.0f, 135.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-float eyeX = 0.0, eyeY = 1.0, eyeZ = 3.0;
+float eyeX = 0.0, eyeY = 1.0, eyeZ = 0.0f;
 float lookAtX = 0.0, lookAtY = 0.0, lookAtZ = 0.0;
 glm::vec3 V = glm::vec3(0.0f, 1.0f, 0.0f);
-
 
 // positions of the point lights
 glm::vec3 pointLightPositions[] = {
@@ -141,8 +140,6 @@ bool specularToggle = true;
 // timing
 float deltaTime = 0.0f;    // time between current frame and last frame
 float lastFrame = 0.0f;
-
-
 
 
 

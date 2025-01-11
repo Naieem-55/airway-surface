@@ -25,6 +25,9 @@
     <Filter Include="Source Files\shaders">
       <UniqueIdentifier>{07ac7438-0691-4e19-a29f-10365daa3f53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\components">
+      <UniqueIdentifier>{df54fb8b-831f-447c-aad4-c8671320be03}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -86,6 +89,18 @@
     <ClInclude Include="headers\vertex_values.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\map_chunk.h">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="building.h">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\map_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\cylinder.h">
+      <Filter>Header Files\shapes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
@@ -142,6 +157,18 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="resources\whiteBackground.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\wall__brick.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\wall__brick2.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\sky_1.jpeg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\sky_2.jpeg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

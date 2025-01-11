@@ -148,6 +148,4 @@ vec3 CalcSpotLight(Material material, SpotLight light, vec3 N, vec3 fragPos, vec
     specular *= attenuation * intensity;
     
     return (ambient + diffuse + specular);
-} 
-
-
+}
