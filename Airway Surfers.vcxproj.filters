@@ -25,6 +25,21 @@
     <Filter Include="Source Files\shaders">
       <UniqueIdentifier>{07ac7438-0691-4e19-a29f-10365daa3f53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\components">
+      <UniqueIdentifier>{df54fb8b-831f-447c-aad4-c8671320be03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\buildings">
+      <UniqueIdentifier>{2e1ad7df-6c7b-460c-8473-71222ffadd16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\fonts">
+      <UniqueIdentifier>{336dc79c-5952-4895-bdec-c0527f3a73cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\imgui">
+      <UniqueIdentifier>{98e81046-cf0f-404e-8c70-8760d31db9d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\imgui">
+      <UniqueIdentifier>{e81a21ac-d004-467a-b9fe-efd7d04cb0fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -33,57 +48,129 @@
     <ClCompile Include="stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="opengl\glad.c">
+    <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_demo.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_draw.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_impl_glfw.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_tables.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_widgets.cpp">
+      <Filter>Source Files\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cube.h">
-      <Filter>Header Files\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="curve.h">
-      <Filter>Header Files\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="octagon.h">
-      <Filter>Header Files\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="sphere.h">
-      <Filter>Header Files\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_camera.h">
+    <ClInclude Include="headers\basic_camera.h">
       <Filter>Header Files\camera</Filter>
     </ClInclude>
-    <ClInclude Include="camera.h">
+    <ClInclude Include="headers\camera.h">
       <Filter>Header Files\camera</Filter>
     </ClInclude>
-    <ClInclude Include="directionLight.h">
+    <ClInclude Include="headers\directionLight.h">
       <Filter>Header Files\lights</Filter>
     </ClInclude>
-    <ClInclude Include="pointLight.h">
+    <ClInclude Include="headers\pointLight.h">
       <Filter>Header Files\lights</Filter>
     </ClInclude>
-    <ClInclude Include="spotLight.h">
+    <ClInclude Include="headers\spotLight.h">
       <Filter>Header Files\lights</Filter>
     </ClInclude>
-    <ClInclude Include="shape_maker_functions.h">
+    <ClInclude Include="headers\cube.h">
+      <Filter>Header Files\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\curve.h">
+      <Filter>Header Files\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\octagon.h">
+      <Filter>Header Files\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\sphere.h">
+      <Filter>Header Files\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\load_texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="load_texture.h">
+    <ClInclude Include="headers\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vertex_values.h">
+    <ClInclude Include="headers\shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\shape_maker_functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\vertex_values.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\map_chunk.h">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="building.h">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\map_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\cylinder.h">
+      <Filter>Header Files\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\collision_cube_gen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\building_location_generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imconfig.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imgui.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imgui_impl_glfw.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imgui_impl_opengl3.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imgui_internal.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imstb_rectpack.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imstb_textedit.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imstb_truetype.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imgui_impl_opengl3_loader.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\SoundPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -91,22 +178,22 @@
     <None Include="README.md">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="fragmentShader.fs">
+    <None Include="shaders\fragmentShader.fs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="fragmentShaderForPhongShading.fs">
+    <None Include="shaders\fragmentShaderForPhongShading.fs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="fragmentShaderForPhongShadingWithTexture.fs">
+    <None Include="shaders\fragmentShaderForPhongShadingWithTexture.fs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="vertexShader.vs">
+    <None Include="shaders\vertexShader.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="vertexShaderForPhongShading.vs">
+    <None Include="shaders\vertexShaderForPhongShading.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="vertexShaderForPhongShadingWithTexture.vs">
+    <None Include="shaders\vertexShaderForPhongShadingWithTexture.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
   </ItemGroup>
@@ -144,5 +231,37 @@
     <Image Include="resources\whiteBackground.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="resources\wall__brick.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\wall__brick2.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\sky_1.jpeg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\sky_2.jpeg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\buildings\g1.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+    <Image Include="resources\buildings\g2.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+    <Image Include="resources\buildings\g3.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+    <Image Include="resources\buildings\g4.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+    <Image Include="resources\buildings\g5.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resources\fonts\KirangHaerang-Regular.ttf">
+      <Filter>Resource Files\fonts</Filter>
+    </Font>
   </ItemGroup>
 </Project>

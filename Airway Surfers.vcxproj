@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\muimr\Favorites\Source\Airway Surfers\opengl\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\muimr\Favorites\Source\Airway Surfers\opengl\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\muimr\Sources\Visual Studio Projects\Airway Surfers\opengl\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\muimr\Sources\Visual Studio Projects\Airway Surfers\opengl\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -108,11 +108,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;freetype/freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -132,40 +133,69 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="opengl\glad.c" />
+    <ClCompile Include="opengl\Include\imgui\imgui.cpp" />
+    <ClCompile Include="opengl\Include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="opengl\Include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="opengl\Include\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="opengl\Include\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="opengl\Include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="opengl\Include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="basic_camera.h" />
-    <ClInclude Include="camera.h" />
-    <ClInclude Include="cube.h" />
-    <ClInclude Include="curve.h" />
-    <ClInclude Include="directionLight.h" />
-    <ClInclude Include="load_texture.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="octagon.h" />
-    <ClInclude Include="pointLight.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="shader.h" />
-    <ClInclude Include="shape_maker_functions.h" />
-    <ClInclude Include="sphere.h" />
-    <ClInclude Include="spotLight.h" />
-    <ClInclude Include="stb_image.h" />
-    <ClInclude Include="vertex_values.h" />
+    <ClInclude Include="building.h" />
+    <ClInclude Include="headers\basic_camera.h" />
+    <ClInclude Include="headers\building_location_generator.h" />
+    <ClInclude Include="headers\camera.h" />
+    <ClInclude Include="headers\collision_cube_gen.h" />
+    <ClInclude Include="headers\cube.h" />
+    <ClInclude Include="headers\curve.h" />
+    <ClInclude Include="headers\cylinder.h" />
+    <ClInclude Include="headers\directionLight.h" />
+    <ClInclude Include="headers\load_texture.h" />
+    <ClInclude Include="headers\main.h" />
+    <ClInclude Include="headers\map_chunk.h" />
+    <ClInclude Include="headers\map_manager.h" />
+    <ClInclude Include="headers\octagon.h" />
+    <ClInclude Include="headers\pointLight.h" />
+    <ClInclude Include="headers\SoundPlayer.h" />
+    <ClInclude Include="headers\utils.h" />
+    <ClInclude Include="headers\resource.h" />
+    <ClInclude Include="headers\shader.h" />
+    <ClInclude Include="headers\shape_maker_functions.h" />
+    <ClInclude Include="headers\sphere.h" />
+    <ClInclude Include="headers\spotLight.h" />
+    <ClInclude Include="headers\stb_image.h" />
+    <ClInclude Include="headers\vertex_values.h" />
+    <ClInclude Include="opengl\Include\imgui\imconfig.h" />
+    <ClInclude Include="opengl\Include\imgui\imgui.h" />
+    <ClInclude Include="opengl\Include\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="opengl\Include\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="opengl\Include\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="opengl\Include\imgui\imgui_internal.h" />
+    <ClInclude Include="opengl\Include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="opengl\Include\imgui\imstb_textedit.h" />
+    <ClInclude Include="opengl\Include\imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragmentShader.fs" />
-    <None Include="fragmentShaderForPhongShading.fs" />
-    <None Include="fragmentShaderForPhongShadingWithTexture.fs" />
     <None Include="README.md" />
-    <None Include="vertexShader.vs" />
-    <None Include="vertexShaderForPhongShading.vs" />
-    <None Include="vertexShaderForPhongShadingWithTexture.vs" />
+    <None Include="shaders\fragmentShader.fs" />
+    <None Include="shaders\fragmentShaderForPhongShading.fs" />
+    <None Include="shaders\fragmentShaderForPhongShadingWithTexture.fs" />
+    <None Include="shaders\vertexShader.vs" />
+    <None Include="shaders\vertexShaderForPhongShading.vs" />
+    <None Include="shaders\vertexShaderForPhongShadingWithTexture.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\bigben.jpg" />
     <Image Include="resources\BigBenFace.bmp" />
+    <Image Include="resources\buildings\g1.jpg" />
+    <Image Include="resources\buildings\g2.jpg" />
+    <Image Include="resources\buildings\g3.jpg" />
+    <Image Include="resources\buildings\g4.jpg" />
+    <Image Include="resources\buildings\g5.jpg" />
     <Image Include="resources\container2.png" />
     <Image Include="resources\container2_specular.png" />
     <Image Include="resources\rsz_11field_image.jpg" />
@@ -174,7 +204,14 @@
     <Image Include="resources\rsz_1texture-grass-field.jpg" />
     <Image Include="resources\rsz_texture-grass-field_specular.jpg" />
     <Image Include="resources\sky.jpg" />
+    <Image Include="resources\sky_1.jpeg" />
+    <Image Include="resources\sky_2.jpeg" />
+    <Image Include="resources\wall__brick.jpg" />
+    <Image Include="resources\wall__brick2.jpg" />
     <Image Include="resources\whiteBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resources\fonts\KirangHaerang-Regular.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
