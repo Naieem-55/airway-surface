@@ -1,50 +1,7 @@
 #include <iostream>
 #include "headers/main.h"
-#include <utility>
-#include <set>
 
 using namespace std;
-
-int LOOP_ITER = 0;
-float PLANE_SPEED = 4.0f;
-glm::vec3 MAP_SIZE = glm::vec3(30.0f, 0.00001f, 60.0f);
-glm::vec3 MAP_TRANSLATE_VECTOR = glm::vec3(0.0f, 0.0f, -60.0f);
-
-float MAP_CENTER = MAP_SIZE.x / 2;
-
-glm::vec3 PLANE_SIZE = glm::vec3(0.5f, 0.5f, 2.0f);
-glm::vec3 PLANE_TRANSLATE_VECTOR = glm::vec3(MAP_CENTER, 2.0f, -10.0f);
-
-std::pair<float, float> PLANE_BOUNDARY(MAP_SIZE.x / 2 - (MAP_SIZE.x / 9), MAP_SIZE.x / 2 + (MAP_SIZE.x / 9)); //for 30.0f sized map, (-12.7, 18.3)
-
-std::vector<glm::vec3> collision_cube_positions;
-
-
-// camera
-Camera camera(glm::vec3(MAP_CENTER, 5.2f, -2.0f));
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
-bool firstMouse = true;
-
-float eyeX = 0.0, eyeY = 1.0, eyeZ = 0.0f;
-float lookAtX = 0.0, lookAtY = 0.0, lookAtZ = 0.0;
-glm::vec3 V = glm::vec3(0.0f, 1.0f, 0.0f);
-
-void processInput(GLFWwindow* window);
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-
-bool isPlaneAtNPercent() {
-    float map_one_third_pos = (MAP_TRANSLATE_VECTOR.z + MAP_SIZE.z) - ((MAP_SIZE.z * 2) / 3);
-    return int(PLANE_TRANSLATE_VECTOR.z) == map_one_third_pos;
-}
-
-void updateMapNewZPosition() {
-    MAP_TRANSLATE_VECTOR.z -= ((MAP_SIZE.z * 0.5));
-}
 
 
 int main()
@@ -70,6 +27,23 @@ int main()
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
+    // Load Custom Font
+    ImFont* customFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("resources/fonts/KirangHaerang-Regular.ttf", 24.0f);
+    if (customFont == nullptr) {
+        std::cerr << "Failed to load font!" << std::endl;
+    }
+ 
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -87,7 +61,8 @@ int main()
     Shader lightingShader("shaders/vertexShaderForPhongShading.vs", "shaders/fragmentShaderForPhongShading.fs");
     Shader ourShader("shaders/vertexShader.vs", "shaders/fragmentShader.fs");
     Shader lightingShaderWithTexture("shaders/vertexShaderForPhongShadingWithTexture.vs", "shaders/fragmentShaderForPhongShadingWithTexture.fs");
-   
+
+
 
     unsigned int cubeVAO, cubeVBO, cubeEBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -136,6 +111,22 @@ int main()
     int game_points = 0;
     std::vector<int> collided_cube_indices;
 
+	//= loadTexture("textures/road.jpg");
+    std::string roadDiffuseMapPath = "resources/road_texture_edited.png";
+    std::string roadSpecularMapPath = "resources/road_texture_edited.png";
+    unsigned int roadDiffMap = loadTexture(roadDiffuseMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    unsigned int roadSpecMap = loadTexture(roadSpecularMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+    gSoundPlayer = new SoundPlayer();
+    if (!gSoundPlayer->loadWavFile("resources/audio/sound2.wav")) {
+        printf("Failed to load sound file!\n");
+        delete gSoundPlayer;
+        gSoundPlayer = nullptr;
+        return -1;
+    }
+
+	make_textures();
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -146,12 +137,25 @@ int main()
 
         processInput(window);
 
+        // Start the frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // Use the custom font for the score text
+        ImGui::PushFont(customFont);  // Activate custom font
+
+        ImGui::Begin("Score");
+        ImGui::Text("\t%d\t", game_points);  // Render the score
+        ImGui::End();
+
+        ImGui::PopFont();  // Revert back to default font
+
         glClearColor(0.53f, 0.81f, 0.98f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         lightingShader.use();
         lightingShader.setVec3("viewPos", camera.Position);
-
 
         pointlight1.setUpPointLight(lightingShader);
         pointlight2.setUpPointLight(lightingShader);
@@ -176,9 +180,6 @@ int main()
         glm::mat4 translate, rotate, revtranslate, alTogether, next, model, scale;
         model =  identityMatrix;
         lightingShader.setMat4("model", model);
-        
-		//Drawing the map
-        create_map(MAP_SIZE, MAP_TRANSLATE_VECTOR, lightingShader, mapAmbient, mapDiffusive, mapSpecular, mapShiny);
 		
         //Drawing the airplane
         translate = glm::translate(identityMatrix, PLANE_TRANSLATE_VECTOR);
@@ -186,12 +187,16 @@ int main()
         model = translate * scale;
         airplane.drawCubeWithMaterialisticProperty(lightingShader, model);
 
-
         //constantly move forward
         float velocity = PLANE_SPEED * deltaTime;
         camera.ProcessKeyboard(FORWARD, deltaTime);
         PLANE_TRANSLATE_VECTOR.z -= velocity;
 
+
+        //generate new buildings when starting out
+        if (left_building_cube_positions.empty() && right_building_cube_positions.empty()) {
+			generateNewBuildings(true);
+        }
 
         //Generate Collision Cube/Sphere so user can get points.
 		if (collision_cube_positions.empty() || PLANE_TRANSLATE_VECTOR.z < (minimum_z_of_point_circles + 2.0f)) { //if the plane is near the minimum z value of the point circles
@@ -202,6 +207,7 @@ int main()
             if (gen_step == 2) { // Remove the first half of the items
                 size_t half_size = collision_cube_positions.size() / 2;
                 collision_cube_positions.erase(collision_cube_positions.begin(), collision_cube_positions.begin() + half_size);
+				collided_cube_indices.clear();
                 gen_step = 0;
             }
             
@@ -270,10 +276,13 @@ int main()
                 // Add this cube's index to collided indices
                 collided_cube_indices.push_back(i);
                 collision_cube_positions[i] = glm::vec3(10.0f, 10.0f, 100.0f); //remove from screen effect.
+                gSoundPlayer->requestPlay();
                 game_points++;
                 // Add your collision response here
             }
         }
+
+
 
 
         //prevent from going below the map
@@ -296,8 +305,8 @@ int main()
         /*bool tr = int(PLANE_TRANSLATE_VECTOR.z) == 40;
         std::cout << int(PLANE_TRANSLATE_VECTOR.z) << std::endl;*/
         if (isPlaneAtNPercent()) {
-            std::cout << "HOLALALALA" << std::endl;
             updateMapNewZPosition();
+			generateNewBuildings(false);
         }
 
         // we now draw as many light bulbs as we have point lights.
@@ -340,7 +349,18 @@ int main()
         daylight.setUpDirectionalLight(lightingShaderWithTexture);
 
 
+        //Drawing the map cube
+        create_map(MAP_SIZE, MAP_TRANSLATE_VECTOR, lightingShaderWithTexture, roadDiffMap, roadSpecMap, 32.0f);
+
+        //draw building
+        drawBuildings(lightingShaderWithTexture);
+
+
         LOOP_ITER++;
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -350,11 +370,14 @@ int main()
     glDeleteBuffers(1, &cubeVBO);
     glDeleteBuffers(1, &cubeEBO);
 
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     glfwTerminate();
     return 0;
 }
-
-
 
 
 /*

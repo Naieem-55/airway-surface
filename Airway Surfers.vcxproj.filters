@@ -28,6 +28,18 @@
     <Filter Include="Header Files\components">
       <UniqueIdentifier>{df54fb8b-831f-447c-aad4-c8671320be03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\buildings">
+      <UniqueIdentifier>{2e1ad7df-6c7b-460c-8473-71222ffadd16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\fonts">
+      <UniqueIdentifier>{336dc79c-5952-4895-bdec-c0527f3a73cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\imgui">
+      <UniqueIdentifier>{98e81046-cf0f-404e-8c70-8760d31db9d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\imgui">
+      <UniqueIdentifier>{e81a21ac-d004-467a-b9fe-efd7d04cb0fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -38,6 +50,27 @@
     </ClCompile>
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_demo.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_draw.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_impl_glfw.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_tables.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\Include\imgui\imgui_widgets.cpp">
+      <Filter>Source Files\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +143,36 @@
     <ClInclude Include="headers\building_location_generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imconfig.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imgui.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imgui_impl_glfw.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imgui_impl_opengl3.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imgui_internal.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imstb_rectpack.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imstb_textedit.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imstb_truetype.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imgui_impl_opengl3_loader.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\SoundPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
@@ -180,5 +243,25 @@
     <Image Include="resources\sky_2.jpeg">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="resources\buildings\g1.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+    <Image Include="resources\buildings\g2.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+    <Image Include="resources\buildings\g3.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+    <Image Include="resources\buildings\g4.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+    <Image Include="resources\buildings\g5.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resources\fonts\KirangHaerang-Regular.ttf">
+      <Filter>Resource Files\fonts</Filter>
+    </Font>
   </ItemGroup>
 </Project>
