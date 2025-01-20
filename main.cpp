@@ -1,23 +1,62 @@
 #include <iostream>
 #include "headers/main.h"
+#include <utility>
+#include <set>
 
 using namespace std;
 
-void drawTajmahal(unsigned int& cubeVAO, Shader& lightingShader, glm::mat4 alTogether);
-void drawSemiDome(unsigned int& cubeVAO, BezierCurve& semiDome, Octagon& base, Octagon& mid, Shader& lightingShader, glm::mat4 alTogether);
-void drawDome(unsigned int& cubeVAO, BezierCurve& semiDome, Octagon& base, Shader& lightingShader, glm::mat4 alTogether);
+int LOOP_ITER = 0;
+float PLANE_SPEED = 4.0f;
+glm::vec3 MAP_SIZE = glm::vec3(30.0f, 0.00001f, 60.0f);
+glm::vec3 MAP_TRANSLATE_VECTOR = glm::vec3(0.0f, 0.0f, -60.0f);
+
+float MAP_CENTER = MAP_SIZE.x / 2;
+
+glm::vec3 PLANE_SIZE = glm::vec3(0.5f, 0.5f, 2.0f);
+glm::vec3 PLANE_TRANSLATE_VECTOR = glm::vec3(MAP_CENTER, 2.0f, -10.0f);
+
+std::pair<float, float> PLANE_BOUNDARY(MAP_SIZE.x / 2 - (MAP_SIZE.x / 9), MAP_SIZE.x / 2 + (MAP_SIZE.x / 9)); //for 30.0f sized map, (-12.7, 18.3)
+
+std::vector<glm::vec3> collision_cube_positions;
+
+
+// camera
+Camera camera(glm::vec3(MAP_CENTER, 5.2f, -2.0f));
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
+bool firstMouse = true;
+
+float eyeX = 0.0, eyeY = 1.0, eyeZ = 0.0f;
+float lookAtX = 0.0, lookAtY = 0.0, lookAtZ = 0.0;
+glm::vec3 V = glm::vec3(0.0f, 1.0f, 0.0f);
+
+void processInput(GLFWwindow* window);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+
+bool isPlaneAtNPercent() {
+    float map_one_third_pos = (MAP_TRANSLATE_VECTOR.z + MAP_SIZE.z) - ((MAP_SIZE.z * 2) / 3);
+    return int(PLANE_TRANSLATE_VECTOR.z) == map_one_third_pos;
+}
+
+void updateMapNewZPosition() {
+    MAP_TRANSLATE_VECTOR.z -= ((MAP_SIZE.z * 0.5));
+}
+
 
 int main()
 {
-
-    // glfw: initialize and configure
+    // GLFW: initialize and configure
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 
-    // glfw window creation
+    // GLFW window creation
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Airway Surfers", NULL, NULL);
     if (window == NULL)
     {
@@ -48,22 +87,7 @@ int main()
     Shader lightingShader("shaders/vertexShaderForPhongShading.vs", "shaders/fragmentShaderForPhongShading.fs");
     Shader ourShader("shaders/vertexShader.vs", "shaders/fragmentShader.fs");
     Shader lightingShaderWithTexture("shaders/vertexShaderForPhongShadingWithTexture.vs", "shaders/fragmentShaderForPhongShadingWithTexture.fs");
-
-
-    float v1[] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
-
-
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(v1), v1, GL_STATIC_DRAW);
-
-    cout << "VBO value: " << vbo << endl;
-
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-
-
+   
 
     unsigned int cubeVAO, cubeVBO, cubeEBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -96,31 +120,21 @@ int main()
     
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // note that we update the lamp's position attribute's stride to reflect the updated buffer data
     glEnableVertexAttribArray(0); 
+    
+    glm::vec4 mapAmbient = glm::vec4(0.0, 1.0, 0.8, 1.0);
+    glm::vec4 mapDiffusive = glm::vec4(0.0, 1.0, 0.8, 1.0);
+    glm::vec4 mapSpecular = glm::vec4(0.0, 1.0, 0.8, 1.0);
+    float mapShiny = 32.0f;
 
-    int loop_timer = 0;
+
+	Cube airplane = Cube(mapAmbient, mapDiffusive, mapSpecular, mapShiny);
 
 
-    //Dome
-    glm::vec4 domeAmbient = glm::vec4(1.0, 1.0, 0.8, 1.0);
-    glm::vec4 domeDiffusive = glm::vec4(1.0, 1.0, 0.8, 1.0);
-    glm::vec4 domeSpecular = glm::vec4(1.0, 1.0, 0.8, 1.0);
-    float domeShiny = 32.0f;
-
-    BezierCurve dome = BezierCurve(domeVerties, 75, domeAmbient, domeDiffusive, domeSpecular, domeShiny, 0);
-    BezierCurve semiDome = BezierCurve(semiDomeVerties, 54, domeAmbient, domeDiffusive, domeSpecular, domeShiny, 0);
-  
-
-    glm::vec4 octAmbient = glm::vec4(0.5, 0.5, 0.5, 1.0);
-    glm::vec4 octDiffusive = glm::vec4(0.5, 0.5, 0.5, 1.0);
-    glm::vec4 octSpecular = glm::vec4(0.7, 0.7, 0.7, 1.0);
-    float octShiny = 32.0f;
-
-    glm::vec4 octWhite = glm::vec4(0.7, 0.7, 0.7, 1.0);
-    glm::vec4 octGrey = glm::vec4(0.7, 0.3, 0.3, 1.0);
-
-    Octagon oct1 = Octagon(octAmbient, octDiffusive, octSpecular, octShiny);
-    Octagon oct2 = Octagon(octWhite, octWhite, octWhite, octShiny);
-    Octagon oct3 = Octagon(octGrey, octGrey, octGrey, octShiny);
+    int score_circle_generation_iter = 5000;
+    float minimum_z_of_point_circles = MAP_SIZE.z; //starting with max possible.
+    int gen_step = 0;
+    int game_points = 0;
+    std::vector<int> collided_cube_indices;
 
     // render loop
     // -----------
@@ -132,7 +146,7 @@ int main()
 
         processInput(window);
 
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.53f, 0.81f, 0.98f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         lightingShader.use();
@@ -143,35 +157,152 @@ int main()
         pointlight2.setUpPointLight(lightingShader);
         pointlight3.setUpPointLight(lightingShader);
         pointlight4.setUpPointLight(lightingShader);
-
         spotlight.setUpSpotLight(lightingShader);
-
         moonlight.setUpDirectionalLight(lightingShader);
         daylight.setUpDirectionalLight(lightingShader);
-
 
         // pass projection matrix to shader (note that in this case it could change every frame)
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 400.0f);
         //glm::mat4 projection = glm::ortho(-2.0f, +2.0f, -1.5f, +1.5f, 0.1f, 100.0f);
         lightingShader.setMat4("projection", projection);
-        
 
         // camera/view transformation
         glm::mat4 view = camera.GetViewMatrix();
         //glm::mat4 view = basic_camera.createViewMatrix();
         lightingShader.setMat4("view", view);
 
-
         // Modelling Transformation
         glm::mat4 identityMatrix = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         glm::mat4 translate, rotate, revtranslate, alTogether, next, model, scale;
         model =  identityMatrix;
         lightingShader.setMat4("model", model);
-
         
+		//Drawing the map
+        create_map(MAP_SIZE, MAP_TRANSLATE_VECTOR, lightingShader, mapAmbient, mapDiffusive, mapSpecular, mapShiny);
+		
+        //Drawing the airplane
+        translate = glm::translate(identityMatrix, PLANE_TRANSLATE_VECTOR);
+        scale = glm::scale(identityMatrix, PLANE_SIZE);
+        model = translate * scale;
+        airplane.drawCubeWithMaterialisticProperty(lightingShader, model);
+
+
+        //constantly move forward
+        float velocity = PLANE_SPEED * deltaTime;
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+        PLANE_TRANSLATE_VECTOR.z -= velocity;
+
+
+        //Generate Collision Cube/Sphere so user can get points.
+		if (collision_cube_positions.empty() || PLANE_TRANSLATE_VECTOR.z < (minimum_z_of_point_circles + 2.0f)) { //if the plane is near the minimum z value of the point circles
+            float minZPossible = PLANE_TRANSLATE_VECTOR.z - MAP_SIZE.z + 10.0f;
+            float maxZPossible = PLANE_TRANSLATE_VECTOR.z - 10.0f;
+            
+            //clear every 2nd generation to eliminate instant cube being taken out of map.
+            if (gen_step == 2) { // Remove the first half of the items
+                size_t half_size = collision_cube_positions.size() / 2;
+                collision_cube_positions.erase(collision_cube_positions.begin(), collision_cube_positions.begin() + half_size);
+                gen_step = 0;
+            }
+            
+            auto new_collision_cubes = generate_collision_cube_position(
+                maxZPossible, minZPossible, 0.3f, 3.0f, PLANE_BOUNDARY.first, PLANE_BOUNDARY.second);
+
+            // Add the new items to the existing collection
+            collision_cube_positions.insert(collision_cube_positions.end(), new_collision_cubes.begin(), new_collision_cubes.end());
+            gen_step++;
+
+            for (const glm::vec3& position : collision_cube_positions) {
+                if (position.z < minimum_z_of_point_circles) {
+                    minimum_z_of_point_circles = position.z; // Update the minimum Z value
+                }
+            }
+        }
+
+        //draw all new cubes
+        for (int i = 0; i < collision_cube_positions.size(); ++i) {
+            // Get the position of the cube
+            glm::vec3 cubePosition = collision_cube_positions[i];
+
+            // Create the translation and scale matrices
+            glm::mat4 translate = glm::translate(identityMatrix, cubePosition);
+            glm::mat4 scale = glm::scale(identityMatrix, glm::vec3(0.5f, 0.5f, 0.5f));
+            glm::mat4 model = translate * scale;
+
+            // Create the Cube object with materialistic properties
+            Cube collision_cube = Cube(
+                glm::vec4(0.1, 0.9, 0.6, 1.0),
+                glm::vec4(0.1, 0.9, 0.6, 1.0),
+                glm::vec4(0.1, 0.9, 0.6, 1.0),
+                80.0f
+            );
+
+            // Draw the cube with the lighting shader and the model matrix
+            collision_cube.drawCubeWithMaterialisticProperty(lightingShader, model);
+        }
+
+
+        //collision
+        for (int i = 0; i < collision_cube_positions.size(); ++i) {
+            // Skip if we've already collided with this cube
+            if (std::find(collided_cube_indices.begin(), collided_cube_indices.end(), i) != collided_cube_indices.end()) {
+                continue;
+            }
+
+            const glm::vec3& cubePosition = collision_cube_positions[i];
+            float cubeMinX = cubePosition.x - 0.25f;
+            float cubeMaxX = cubePosition.x + 0.25f;
+            float cubeMinY = cubePosition.y - 0.25f;
+            float cubeMaxY = cubePosition.y + 0.25f;
+            float cubeMinZ = cubePosition.z - 0.25f;
+            float cubeMaxZ = cubePosition.z + 0.25f;
+
+            float planeMinX = PLANE_TRANSLATE_VECTOR.x - (PLANE_SIZE.x / 2);
+            float planeMaxX = PLANE_TRANSLATE_VECTOR.x + (PLANE_SIZE.x / 2);
+            float planeMinY = PLANE_TRANSLATE_VECTOR.y - (PLANE_SIZE.y / 2);
+            float planeMaxY = PLANE_TRANSLATE_VECTOR.y + (PLANE_SIZE.y / 2);
+            float planeMinZ = PLANE_TRANSLATE_VECTOR.z - (PLANE_SIZE.z / 2);
+            float planeMaxZ = PLANE_TRANSLATE_VECTOR.z + (PLANE_SIZE.z / 2);
+
+            if (planeMaxX > cubeMinX && planeMinX < cubeMaxX &&
+                planeMaxY > cubeMinY && planeMinY < cubeMaxY &&
+                planeMaxZ > cubeMinZ && planeMinZ < cubeMaxZ) {
+                // Add this cube's index to collided indices
+                collided_cube_indices.push_back(i);
+                collision_cube_positions[i] = glm::vec3(10.0f, 10.0f, 100.0f); //remove from screen effect.
+                game_points++;
+                // Add your collision response here
+            }
+        }
+
+
+        //prevent from going below the map
+        if (PLANE_TRANSLATE_VECTOR.y < 0.1f) {
+			PLANE_TRANSLATE_VECTOR.y = 0.1f;
+        }
+		//prevent from going above the map
+        if (PLANE_TRANSLATE_VECTOR.y > 20.0f) {
+            PLANE_TRANSLATE_VECTOR.y = 20.0f;
+        }
+		if (PLANE_TRANSLATE_VECTOR.x < PLANE_BOUNDARY.first) {
+			PLANE_TRANSLATE_VECTOR.x = PLANE_BOUNDARY.first;
+		}
+		if (PLANE_TRANSLATE_VECTOR.x > PLANE_BOUNDARY.second) {
+			PLANE_TRANSLATE_VECTOR.x = PLANE_BOUNDARY.second;
+		}
+
+        //std::cout << "PLANE Z " << PLANE_TRANSLATE_VECTOR.z << std::endl;
+        //std::cout << "MAP Z " << MAP_TRANSLATE_VECTOR.z << std::endl;
+        /*bool tr = int(PLANE_TRANSLATE_VECTOR.z) == 40;
+        std::cout << int(PLANE_TRANSLATE_VECTOR.z) << std::endl;*/
+        if (isPlaneAtNPercent()) {
+            std::cout << "HOLALALALA" << std::endl;
+            updateMapNewZPosition();
+        }
+
         // we now draw as many light bulbs as we have point lights.
         glBindVertexArray(lightCubeVAO);
-        for (unsigned int i = 0; i < 4; i++)
+        for (unsigned int i = 0; i < 0; i++)
         {
             model = glm::mat4(1.0f);
             model = glm::translate(model, pointLightPositions[i]);
@@ -208,36 +339,8 @@ int main()
         moonlight.setUpDirectionalLight(lightingShaderWithTexture);
         daylight.setUpDirectionalLight(lightingShaderWithTexture);
 
-        
-        model = identityMatrix;
-        lightingShaderWithTexture.setMat4("model", model);
 
-        translate = glm::translate(identityMatrix, glm::vec3(0.0f, 0.0f, 30.0f));
-        scale = glm::scale(identityMatrix, glm::vec3(90.0f, 90.0f, 90.0f));
-        rotate = glm::rotate(identityMatrix, glm::radians(20.0f * 0.05f), glm::vec3(0.0f, 1.0f, 0.0f));
-        model = translate * scale;
-
-
-
-
-        ////Map creation and deletion logic.
-        //loop_timer++;
-        //if (loop_timer % 10000 == 0){
-        //    map_translate_position[0] += 0.0f;
-        //    map_translate_position[1] += 0.0f;
-        //    map_translate_position[2] += 1.0f;
-
-        //    cout << "New position: " << map_translate_position[0] << endl;
-        //}
-
-        create_map(glm::vec3(0.0f, 0.0f, 0.0f), lightingShaderWithTexture);
-        //create_map(glm::vec3(0.0f, 0.0f, 1000.0f), lightingShaderWithTexture);
-        
-
-
-        glm::mat4 modelMatrixForContainer = glm::mat4(1.0f);
-        modelMatrixForContainer = glm::translate(identityMatrix, glm::vec3(0.0f, 3.0f, 2.0f));
-       
+        LOOP_ITER++;
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -253,84 +356,223 @@ int main()
 
 
 
-//void drawDome(unsigned int& cubeVAO, BezierCurve& Dome, Octagon& base, Shader& lightingShader, glm::mat4 alTogether)
-//{
-//    glm::mat4 model = glm::mat4(1.0f);
-//    glm::mat4 translate = glm::mat4(1.0f);
-//    glm::mat4 identityMatrix = glm::mat4(1.0f);
-//    glm::mat4 scale = glm::mat4(1.0f);
-//    glm::mat4 rotate = glm::mat4(1.0f);
-//
-//
-//
-//    scale = glm::scale(identityMatrix, glm::vec3(4.0, 5.0, 4.0));
-//    translate = glm::translate(identityMatrix, glm::vec3(3.5, 1.0, 3.5));
-//    model = alTogether * translate * scale;
-//    Dome.drawBezierCurve(lightingShader, model);
-//
-//    scale = glm::scale(identityMatrix, glm::vec3(3.0, 3.0, 3.0));
-//    model = alTogether * scale;
-//    base.drawOctagonWithMaterialisticProperty(lightingShader, model);
-//
-//}
 
-//void drawSemiDome(unsigned int& cubeVAO, BezierCurve& spire, Octagon& base, Octagon& mid, Shader& lightingShader, glm::mat4 alTogether) {
-//    glm::mat4 model = glm::mat4(1.0f);
-//    glm::mat4 translate = glm::mat4(1.0f);
-//    glm::mat4 identityMatrix = glm::mat4(1.0f);
-//    glm::mat4 scale = glm::mat4(1.0f);
-//    glm::mat4 rotate = glm::mat4(1.0f);
-//
-//    // Scale and translate the spire (narrow top)
-//    scale = glm::scale(identityMatrix, glm::vec3(2.2, 4.5, 0.5));  // Smaller width for the spire
-//    translate = glm::translate(identityMatrix, glm::vec3(1.8, -2.0, 1.8));  // Move the spire to the top
-//    model = alTogether * translate * scale;
-//    spire.drawBezierCurve(lightingShader, model);
-//
-//    // Scale and translate the base (larger octagon)
-//    scale = glm::scale(identityMatrix, glm::vec3(2.0, 0.5, 2.0));  // Broader base
-//    translate = glm::translate(identityMatrix, glm::vec3(-0.8, 0.5, 1.8));  // Position the base
-//    model = alTogether * translate * scale;
-//    base.drawOctagonWithMaterialisticProperty(lightingShader, model);
-//
-//    // Scale and translate the middle section (Mid-tier)
-//    scale = glm::scale(identityMatrix, glm::vec3(1.8, 0.3, 1.8));  // Slightly thinner middle section
-//    translate = glm::translate(identityMatrix, glm::vec3(-0.5, 2.5, 0.0));  // Positioned in the middle of the tower
-//    model = alTogether * translate * scale;
-//    mid.drawOctagonWithMaterialisticProperty(lightingShader, model);
-//
-//    // Adding cube shapes for detailing at the base (like columns or smaller structures)
-//    scale = glm::scale(identityMatrix, glm::vec3(0.3, 1.5, 0.3));  // Small supporting cubes
-//    translate = glm::translate(identityMatrix, glm::vec3(1.1, 1.0, 0.1));  // Positions for detailing
-//    model = alTogether * translate * scale;
-//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
-//
-//    translate = glm::translate(identityMatrix, glm::vec3(2.2, 1.0, 0.1));
-//    model = alTogether * translate * scale;
-//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
-//
-//    translate = glm::translate(identityMatrix, glm::vec3(3.2, 1.0, 1.1));
-//    model = alTogether * translate * scale;
-//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
-//
-//    translate = glm::translate(identityMatrix, glm::vec3(3.2, 1.0, 2.2));
-//    model = alTogether * translate * scale;
-//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
-//
-//    translate = glm::translate(identityMatrix, glm::vec3(2.2, 1.0, 3.2));
-//    model = alTogether * translate * scale;
-//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
-//
-//    translate = glm::translate(identityMatrix, glm::vec3(1.1, 1.0, 3.2));
-//    model = alTogether * translate * scale;
-//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
-//
-//    translate = glm::translate(identityMatrix, glm::vec3(0.1, 1.0, 1.1));
-//    model = alTogether * translate * scale;
-//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
-//
-//    translate = glm::translate(identityMatrix, glm::vec3(0.1, 1.0, 2.2));
-//    model = alTogether * translate * scale;
-//    drawCube(cubeVAO, lightingShader, model, 0.9, 0.9, 0.9);
-//}
-//
+/*
+    Process Input
+*/
+
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
+
+
+// glfw: whenever the mouse moves, this callback is called
+// -------------------------------------------------------
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    std::cout << "scrolling " << std::endl;
+    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+
+void processInput(GLFWwindow* window)
+{
+    float velocity = PLANE_SPEED * deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    /*if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+        PLANE_TRANSLATE_VECTOR.z -= velocity;
+    }*/
+    /*if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+        PLANE_TRANSLATE_VECTOR.z += velocity;
+    }*/
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        //camera.ProcessKeyboard(LEFT, deltaTime);
+        PLANE_TRANSLATE_VECTOR.x -= velocity * 3;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        //camera.ProcessKeyboard(RIGHT, deltaTime);
+        PLANE_TRANSLATE_VECTOR.x += velocity * 3;
+    }
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+        camera.ProcessKeyboard(YAWR, deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+        camera.ProcessKeyboard(YAWL, deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        //camera.ProcessKeyboard(PITCHU, deltaTime * 3);
+        PLANE_TRANSLATE_VECTOR.y += velocity * 3;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        //camera.ProcessKeyboard(PITCHD, deltaTime);
+        PLANE_TRANSLATE_VECTOR.y -= velocity * 3;
+    }
+}
+
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+    {
+        if (pointLightOn)
+        {
+            pointlight1.turnOff();
+            pointlight2.turnOff();
+            pointlight3.turnOff();
+            pointlight4.turnOff();
+            pointLightOn = !pointLightOn;
+        }
+        else
+        {
+            pointlight1.turnOn();
+            pointlight2.turnOn();
+            pointlight3.turnOn();
+            pointlight4.turnOn();
+            pointLightOn = !pointLightOn;
+        }
+    }
+
+
+    else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+    {
+        if (specularToggle)
+        {
+
+            pointlight1.turnSpecularOff();
+            pointlight2.turnSpecularOff();
+            pointlight3.turnSpecularOff();
+            pointlight4.turnSpecularOff();
+
+            specularToggle = !specularToggle;
+        }
+        else
+        {
+
+            pointlight1.turnSpecularOn();
+            pointlight2.turnSpecularOn();
+            pointlight3.turnSpecularOn();
+            pointlight4.turnSpecularOn();
+            specularToggle = !specularToggle;
+        }
+    }
+
+    else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+    {
+        if (diffuseToggle)
+        {
+
+            pointlight1.turnDiffuseOff();
+            pointlight2.turnDiffuseOff();
+            pointlight3.turnDiffuseOff();
+            pointlight4.turnDiffuseOff();
+            diffuseToggle = !diffuseToggle;
+        }
+        else
+        {
+
+            pointlight1.turnDiffuseOn();
+            pointlight2.turnDiffuseOn();
+            pointlight3.turnDiffuseOn();
+            pointlight4.turnDiffuseOn();
+            diffuseToggle = !diffuseToggle;
+        }
+    }
+
+    else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+    {
+        if (ambientToggle)
+        {
+
+            pointlight1.turnAmbientOff();
+            pointlight2.turnAmbientOff();
+            pointlight3.turnAmbientOff();
+            pointlight4.turnAmbientOff();
+            ambientToggle = !ambientToggle;
+        }
+        else
+        {
+
+            pointlight1.turnAmbientOn();
+            pointlight2.turnAmbientOn();
+            pointlight3.turnAmbientOn();
+            pointlight4.turnAmbientOn();
+            ambientToggle = !ambientToggle;
+        }
+    }
+
+    else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+    {
+        if (spotLightOn)
+        {
+
+            spotlight.turnOff();
+            spotLightOn = !spotLightOn;
+        }
+        else
+        {
+            spotlight.turnOn();
+            spotLightOn = !spotLightOn;
+        }
+    }
+
+    else if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
+    {
+        if (dayLightOn)
+        {
+
+            daylight.turnOff();
+            dayLightOn = false;
+        }
+        else
+        {
+            daylight.turnOn();
+            dayLightOn = true;
+        }
+    }
+
+    else if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+    {
+        if (moonLightOn)
+        {
+
+            moonlight.turnOff();
+            moonLightOn = !moonLightOn;
+        }
+        else
+        {
+            moonlight.turnOn();
+            moonLightOn = !moonLightOn;
+        }
+    }
+}

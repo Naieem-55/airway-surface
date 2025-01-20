@@ -1,11 +1,4 @@
 #pragma once
-//
-//  camera.h
-//  3D Object Drawing
-//
-//  Created by Nazirul Hasan on 4/9/23.
-//
-
 #ifndef CAMERA_H
 #define CAMERA_H
 
@@ -29,7 +22,7 @@ enum Camera_Movement {
 // Default camera values
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float SPEED = 16.0f;
+const float SPEED = 4.0f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
 
@@ -80,10 +73,20 @@ public:
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
         float velocity = MovementSpeed * deltaTime;
-        if (direction == FORWARD)
-            Position += Front * velocity;
-        if (direction == BACKWARD)
-            Position -= Front * velocity;
+        if (direction == FORWARD) {
+            // Create a horizontal-only front vector by zeroing the y component
+            glm::vec3 horizontalFront = Front;
+            horizontalFront.y = 0;
+            horizontalFront.x = 0;
+            horizontalFront = glm::normalize(horizontalFront);
+            Position += horizontalFront * velocity;
+        }
+        if (direction == BACKWARD) {
+            glm::vec3 horizontalFront = Front;
+            horizontalFront.y = 0;
+            horizontalFront = glm::normalize(horizontalFront);
+            Position -= horizontalFront * velocity;
+        }
         if (direction == LEFT)
             Position -= Right * velocity;
         if (direction == RIGHT)
@@ -97,6 +100,7 @@ public:
         if (direction == PITCHD)
             Pitch -= 5 * velocity;
 
+      
 
         updateCameraVectors();
     }

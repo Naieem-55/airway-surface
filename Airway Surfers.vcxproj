@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\muimr\Favorites\Source\Airway Surfers\opengl\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\muimr\Favorites\Source\Airway Surfers\opengl\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\muimr\Sources\Visual Studio Projects\Airway Surfers\opengl\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\muimr\Sources\Visual Studio Projects\Airway Surfers\opengl\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -132,14 +132,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="opengl\glad.c" />
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="building.h" />
     <ClInclude Include="headers\basic_camera.h" />
+    <ClInclude Include="headers\building_location_generator.h" />
     <ClInclude Include="headers\camera.h" />
+    <ClInclude Include="headers\collision_cube_gen.h" />
     <ClInclude Include="headers\cube.h" />
     <ClInclude Include="headers\curve.h" />
     <ClInclude Include="headers\cylinder.h" />
@@ -150,6 +152,7 @@
     <ClInclude Include="headers\map_manager.h" />
     <ClInclude Include="headers\octagon.h" />
     <ClInclude Include="headers\pointLight.h" />
+    <ClInclude Include="headers\utils.h" />
     <ClInclude Include="headers\resource.h" />
     <ClInclude Include="headers\shader.h" />
     <ClInclude Include="headers\shape_maker_functions.h" />
