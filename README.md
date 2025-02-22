@@ -2,9 +2,16 @@
 
 **Airway Surface** is an OpenGL-based graphics simulation that visualizes an airway environment. This project demonstrates interactive object movement, rendering techniques, and real-time graphics processing.
 
-![Airway Surface Screenshot](s1.jpg)
-![Airway Surface Screenshot](s2.jpg)
-![Airway Surface Screenshot](s3.jpg)
+## 📌 Screenshots
+### 🖼️ Image 1: Main Scene
+![Main Scene](S1.jpg)
+
+### 🖼️ Image 2: Buildings
+![Building](S2.jpg)
+
+### 🖼️ Image 3: Roads & structure
+![Road & structure](S3.jpg)
+
 
 ## 🚀 Features
 - ✈️ Realistic airway environment simulation  
