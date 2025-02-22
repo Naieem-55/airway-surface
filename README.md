@@ -3,14 +3,10 @@
 **Airway Surface** is an OpenGL-based graphics simulation that visualizes an airway environment. This project demonstrates interactive object movement, rendering techniques, and real-time graphics processing.
 
 ## 📌 Screenshots
-### 🖼️ Image 1: Main Scene
-![Main Scene](S1.jpg)
+![Main Scene](https://raw.githubusercontent.com/Naieem-55/airway-surface/main/S1.png)
+![Object Movement](https://raw.githubusercontent.com/Naieem-55/airway-surface/main/S2.png)
+![Structure ](https://raw.githubusercontent.com/Naieem-55/airway-surface/main/S3.png)
 
-### 🖼️ Image 2: Buildings
-![Building](S2.jpg)
-
-### 🖼️ Image 3: Roads & structure
-![Road & structure](S3.jpg)
 
 
 ## 🚀 Features
