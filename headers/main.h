@@ -43,6 +43,11 @@
 const unsigned int SCR_WIDTH = 1500;
 const unsigned int SCR_HEIGHT = 1000;
 
+float rotateAngle_X = 0.0f;
+float rotateAngle_Y = 0.0f;
+float rotateAngle_Z = 0.0f;
+float fanRotationAngle = 30.0f;
+
 // camera settings
 int LOOP_ITER = 0;
 float PLANE_SPEED = 7.0f;
@@ -66,6 +71,9 @@ std::vector<glm::vec3> right_building_scales;
 std::vector<unsigned int> left_building_texture_indices;
 std::vector<unsigned int> right_building_texture_indices;
 
+std::vector<glm::vec3> right_lamp_cube_positions;
+std::vector<glm::vec3> left_lamp_cube_positions;
+
 //glm::vec3 building_scale_vector = glm::vec3(randomNumber(bsz_min, bsz_max), randomNumber(bsz_min, bsz_max), randomNumber(bsz_min, bsz_max));
 
 // camera
@@ -78,11 +86,11 @@ float eyeX = 0.0, eyeY = 1.0, eyeZ = 0.0f;
 float lookAtX = 0.0, lookAtY = 0.0, lookAtZ = 0.0;
 glm::vec3 V = glm::vec3(0.0f, 1.0f, 0.0f);
 
-float bsZ_min = 1.5f;
-float bsZ_max = 6.0f;
+float bsZ_min = 1.2f;
+float bsZ_max = 5.0f;
 
-float bsX_min = 1.0f;
-float bsX_max = 5.0f;
+float bsX_min = 1.5f;
+float bsX_max = 6.0f;
 
 SoundPlayer* gSoundPlayer = nullptr;
 
@@ -274,6 +282,37 @@ void generateNewBuildings(bool isProgramInit) {
     }
 }
 
+void generateNewLamps(bool isProgramInit) {
+    float minZPossible = PLANE_TRANSLATE_VECTOR.z - 10.0f; //in-front of plane
+    float maxZPossible = PLANE_TRANSLATE_VECTOR.z - int(MAP_SIZE.z * 0.7);
+
+    int each_side_lamp_count = 5;
+
+    /*
+    * Left Side Lamps
+    */
+    left_lamp_cube_positions = generate_building_locations(each_side_lamp_count, minZPossible, maxZPossible,
+        0.0f, 0.0f, PLANE_BOUNDARY.first + (bsX_max * 1.00f), PLANE_BOUNDARY.first + (bsX_max * 1.00f));
+
+
+    /*
+    * Right Side Lamps
+    */
+    right_lamp_cube_positions = generate_building_locations(each_side_lamp_count, minZPossible, maxZPossible,
+        0.0f, 0.0f, PLANE_BOUNDARY.second + (bsX_max * 1.00f), PLANE_BOUNDARY.second + (bsX_max * 1.00f));
+
+    /*
+    * Remove lamp that are out of range.
+    */
+    if (!isProgramInit) {
+        //clear previous 12 lamp left
+        left_lamp_cube_positions.erase(left_lamp_cube_positions.begin(), left_lamp_cube_positions.begin() + int(left_lamp_cube_positions.size() / 2));
+
+        //clear previous 12 lamp right
+        right_lamp_cube_positions.erase(right_lamp_cube_positions.begin(), right_lamp_cube_positions.begin() + int(right_lamp_cube_positions.size() / 2));
+    }
+}
+
 void make_textures() {
     std::string directoryPath = "resources/buildings/";
 
@@ -333,3 +372,113 @@ void drawBuildings(Shader & lightingShader) {
         building_cube.drawCubeWithTexture(lightingShader, model);
     }
 }
+
+void drawFan(Shader& lightingShaderWithTexture, Cube& bladeCube) {
+    glm::mat4 model, translate, rotate, scale;
+
+    // Center of the fan in front of the plane
+    translate = glm::translate(glm::mat4(1.0f), glm::vec3(
+        PLANE_TRANSLATE_VECTOR.x + 0.1f,
+        PLANE_TRANSLATE_VECTOR.y + 0.2f,
+        PLANE_TRANSLATE_VECTOR.z 
+    ));
+
+    // Rotation around the Z-axis
+    rotate = glm::rotate(translate, glm::radians(fanRotationAngle), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    // Draw multiple blades of the fan
+    for (int i = 0; i < 3; i++) {
+        glm::mat4 bladeTransform = glm::rotate(rotate, glm::radians(120.0f * i), glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::scale(bladeTransform, glm::vec3(0.05f, 0.8f, 0.02f)); // Scale for blade dimensions
+        bladeCube.drawCubeWithTexture(lightingShaderWithTexture, model);
+    }
+}
+
+
+void drawPlane(Shader& lightingShaderWithTexture, Cube & bodyCube, Cube &wingCube, Cube& bladeCube) {
+    glm::mat4 translate, rotate, revtranslate, alTogether, next, model, scale, rotateXMatrix, rotateYMatrix, rotateZMatrix;
+    model = glm::mat4(1.0f);
+    translate = glm::translate(model, PLANE_TRANSLATE_VECTOR);
+    rotateXMatrix = glm::rotate(translate, glm::radians(rotateAngle_X), glm::vec3(1.0f, 0.0f, 0.0f));
+    rotateYMatrix = glm::rotate(rotateXMatrix, glm::radians(rotateAngle_Y), glm::vec3(0.0f, 1.0f, 0.0f));
+    rotateZMatrix = glm::rotate(rotateYMatrix, glm::radians(rotateAngle_Z), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(rotateZMatrix, glm::vec3(0.25f, 0.25f, 1.75f));
+    bodyCube.drawCubeWithTexture(lightingShaderWithTexture, model);
+
+
+    model = glm::mat4(1.0f);
+    translate = glm::translate(model, glm::vec3((PLANE_TRANSLATE_VECTOR.x - (1.35f / 2)), (PLANE_TRANSLATE_VECTOR.y + 0.1f), (PLANE_TRANSLATE_VECTOR.z + 0.4f)));
+    rotateXMatrix = glm::rotate(translate, glm::radians(rotateAngle_X), glm::vec3(1.0f, 0.0f, 0.0f));
+    rotateYMatrix = glm::rotate(rotateXMatrix, glm::radians(rotateAngle_Y + 90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    rotateZMatrix = glm::rotate(rotateYMatrix, glm::radians(rotateAngle_Z ), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(rotateZMatrix, glm::vec3(0.15f, 0.01f, 1.55f));
+    wingCube.drawCubeWithTexture(lightingShaderWithTexture, model);
+
+    model = glm::mat4(1.0f);
+    translate = glm::translate(model, glm::vec3((PLANE_TRANSLATE_VECTOR.x + 0.1f), (PLANE_TRANSLATE_VECTOR.y + 0.1f), (PLANE_TRANSLATE_VECTOR.z + 1.6f)));
+    rotateXMatrix = glm::rotate(translate, glm::radians(rotateAngle_X), glm::vec3(1.0f, 0.0f, 0.0f));
+    rotateYMatrix = glm::rotate(rotateXMatrix, glm::radians(rotateAngle_Y + 90.0f - 30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    rotateZMatrix = glm::rotate(rotateYMatrix, glm::radians(rotateAngle_Z ), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(rotateZMatrix, glm::vec3(0.15f, 0.01f, 0.55f));
+    wingCube.drawCubeWithTexture(lightingShaderWithTexture, model);
+
+    model = glm::mat4(1.0f);
+    translate = glm::translate(model, glm::vec3((PLANE_TRANSLATE_VECTOR.x), (PLANE_TRANSLATE_VECTOR.y + 0.1f), (PLANE_TRANSLATE_VECTOR.z + 1.6f)));
+    rotateXMatrix = glm::rotate(translate, glm::radians(rotateAngle_X), glm::vec3(1.0f, 0.0f, 0.0f));
+    rotateYMatrix = glm::rotate(rotateXMatrix, glm::radians(rotateAngle_Y + 270.0f + 30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    rotateZMatrix = glm::rotate(rotateYMatrix, glm::radians(rotateAngle_Z), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(rotateZMatrix, glm::vec3(0.15f, 0.01f, 0.55f));
+    wingCube.drawCubeWithTexture(lightingShaderWithTexture, model);
+
+    // Draw the fan
+    drawFan(lightingShaderWithTexture, bladeCube);
+}
+
+
+void LampPost(Shader ourShader, glm::mat4 moveMatrix, unsigned int &cubeVAO, glm::vec3 translation)
+{
+    glm::mat4 identityMatrix = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+    glm::mat4 translateMatrix, scaleMatrix, model, rotateZMatrix, rotateXMatrix, rotateYMatrix, rotate;
+
+    //base
+    translateMatrix = glm::translate(identityMatrix, translation);
+    scaleMatrix = glm::scale(identityMatrix, glm::vec3(0.7f, 0.3f, 0.7f));
+    model = translateMatrix * scaleMatrix;
+    ourShader.setMat4("model", moveMatrix * model);
+    ourShader.setVec4("material.ambient", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    ourShader.setVec4("material.diffuse", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    ourShader.setVec4("material.specular", glm::vec4(0.0, 0.0f, 0.0f, 1.0f));
+    ourShader.setFloat("material.shininess", 32.0f);
+    glBindVertexArray(cubeVAO);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+    //pillar
+    translation.x += 0.35f;
+    translation.z += 0.35f;
+    translateMatrix = glm::translate(identityMatrix, translation);
+    scaleMatrix = glm::scale(identityMatrix, glm::vec3(0.1f, 6.0f, 0.1f));
+    model = translateMatrix * scaleMatrix;
+    ourShader.setMat4("model", moveMatrix * model);
+    ourShader.setVec4("material.ambient", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    ourShader.setVec4("material.diffuse", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    ourShader.setVec4("material.specular", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    ourShader.setFloat("material.shininess", 32.0f);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+
+    //pillar top
+    translateMatrix = glm::translate(identityMatrix, glm::vec3(0.1f, 6.0f, 0.1f));
+    rotateXMatrix = glm::rotate(translateMatrix, glm::radians(rotateAngle_X), glm::vec3(1.0f, 0.0f, 0.0f));
+    rotateYMatrix = glm::rotate(rotateXMatrix, glm::radians(rotateAngle_Y - 30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    rotateZMatrix = glm::rotate(rotateYMatrix, glm::radians(rotateAngle_Z), glm::vec3(0.0f, 0.0f, 1.0f));
+    scaleMatrix = glm::scale(identityMatrix, glm::vec3(0.1f, 6.0f, 0.1f));
+    model = translateMatrix * scaleMatrix;
+    ourShader.setMat4("model", moveMatrix * model);
+    ourShader.setVec4("material.ambient", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    ourShader.setVec4("material.diffuse", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    ourShader.setVec4("material.specular", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    ourShader.setFloat("material.shininess", 32.0f);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+}
+

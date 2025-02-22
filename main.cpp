@@ -2,6 +2,9 @@
 #include "headers/main.h"
 
 using namespace std;
+unsigned int texture0;
+
+void updateFanRotation();
 
 
 int main()
@@ -109,6 +112,7 @@ int main()
     float minimum_z_of_point_circles = MAP_SIZE.z; //starting with max possible.
     int gen_step = 0;
     int game_points = 0;
+    float distance_covered = 0.0f;
     std::vector<int> collided_cube_indices;
 
 	//= loadTexture("textures/road.jpg");
@@ -118,12 +122,34 @@ int main()
     unsigned int roadSpecMap = loadTexture(roadSpecularMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
     gSoundPlayer = new SoundPlayer();
-    if (!gSoundPlayer->loadWavFile("resources/audio/sound2.wav")) {
+    if (!gSoundPlayer->loadWavFile("resources/audio/sound4.wav")) {
         printf("Failed to load sound file!\n");
         delete gSoundPlayer;
         gSoundPlayer = nullptr;
         return -1;
     }
+
+
+    //draw plane
+    std::string planeDiffuseMapPath = "resources/plane.jpeg";
+    std::string planeSpecularMapPath = "resources/plane.jpeg";
+    unsigned int planeDiffMap = loadTexture(planeDiffuseMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    unsigned int planeSpecMap = loadTexture(planeSpecularMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+    Cube planeBodyCube = Cube(planeDiffMap, planeSpecMap, 30.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+
+    planeDiffuseMapPath = "resources/plane_wings.jpg";
+    planeSpecularMapPath = "resources/plane_wings.jpg";
+    planeDiffMap = loadTexture(planeDiffuseMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    planeSpecMap = loadTexture(planeSpecularMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    Cube planeWingsCube = Cube(planeDiffMap, planeSpecMap, 30.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+
+    planeDiffuseMapPath = "resources/bigben.jpg";
+    planeSpecularMapPath = "resources/bigben.jpg";
+    planeDiffMap = loadTexture(planeDiffuseMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    planeSpecMap = loadTexture(planeSpecularMapPath.c_str(), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    Cube planeBladeCube = Cube(planeDiffMap, planeSpecMap, 30.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+
 
 	make_textures();
 
@@ -145,8 +171,18 @@ int main()
         // Use the custom font for the score text
         ImGui::PushFont(customFont);  // Activate custom font
 
-        ImGui::Begin("Score");
-        ImGui::Text("\t%d\t", game_points);  // Render the score
+        ImGui::SetNextWindowSize(ImVec2(300, 200));
+        ImGui::Begin("Dashboard");
+        ImGui::Text("Points : \t%d\t", game_points);  // Render the score
+        ImGui::Spacing();
+        ImGui::Text("Distance : \t%.1f\t", distance_covered);
+        ImGui::Spacing();
+        ImGui::Text("X Pos : \t%.2f\t", PLANE_TRANSLATE_VECTOR.x);
+        ImGui::Spacing();
+        ImGui::Text("Y Pos : \t%.2f\t", PLANE_TRANSLATE_VECTOR.y);
+        ImGui::Spacing();
+        ImGui::Text("X Pos : \t%.2f\t", PLANE_TRANSLATE_VECTOR.z);
+
         ImGui::End();
 
         ImGui::PopFont();  // Revert back to default font
@@ -183,7 +219,7 @@ int main()
 		
         //Drawing the airplane
         translate = glm::translate(identityMatrix, PLANE_TRANSLATE_VECTOR);
-        scale = glm::scale(identityMatrix, PLANE_SIZE);
+        scale = glm::scale(identityMatrix, glm::vec3(0.01f, 0.01f, 0.01f));
         model = translate * scale;
         airplane.drawCubeWithMaterialisticProperty(lightingShader, model);
 
@@ -196,6 +232,7 @@ int main()
         //generate new buildings when starting out
         if (left_building_cube_positions.empty() && right_building_cube_positions.empty()) {
 			generateNewBuildings(true);
+            generateNewLamps(true);
         }
 
         //Generate Collision Cube/Sphere so user can get points.
@@ -229,39 +266,51 @@ int main()
         for (int i = 0; i < collision_cube_positions.size(); ++i) {
             // Get the position of the cube
             glm::vec3 cubePosition = collision_cube_positions[i];
-
-            // Create the translation and scale matrices
             glm::mat4 translate = glm::translate(identityMatrix, cubePosition);
-            glm::mat4 scale = glm::scale(identityMatrix, glm::vec3(0.5f, 0.5f, 0.5f));
+            scale = glm::scale(identityMatrix, glm::vec3(0.0001f, 0.0001f, 0.0001f));
             glm::mat4 model = translate * scale;
 
             // Create the Cube object with materialistic properties
             Cube collision_cube = Cube(
-                glm::vec4(0.1, 0.9, 0.6, 1.0),
-                glm::vec4(0.1, 0.9, 0.6, 1.0),
-                glm::vec4(0.1, 0.9, 0.6, 1.0),
+                glm::vec4(0.4, 0.5, 0.5, 1.0),
+                glm::vec4(0.4, 0.5, 0.5, 1.0),
+                glm::vec4(0.4, 0.5, 0.5, 1.0),
                 80.0f
             );
+            Cylinder collision_cylinder = Cylinder(true);
 
             // Draw the cube with the lighting shader and the model matrix
             collision_cube.drawCubeWithMaterialisticProperty(lightingShader, model);
+
+            glm::mat4 rotateXMatrix, rotateYMatrix, rotateZMatrix;
+            translate = glm::translate(identityMatrix, cubePosition);
+            rotateXMatrix = glm::rotate(translate, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            rotateYMatrix = glm::rotate(rotateXMatrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            rotateZMatrix = glm::rotate(rotateYMatrix, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+            //scale = glm::scale(rotateZMatrix, PLANE_SIZE);
+            //scale = glm::scale(identityMatrix, PLANE_SIZE);
+            model = glm::scale(rotateZMatrix, glm::vec3(0.6f, 0.6f, 0.6f));
+            collision_cylinder.drawCylinder(lightingShader, model);
         }
 
 
         //collision
         for (int i = 0; i < collision_cube_positions.size(); ++i) {
             // Skip if we've already collided with this cube
+            distance_covered += 0.674f;
             if (std::find(collided_cube_indices.begin(), collided_cube_indices.end(), i) != collided_cube_indices.end()) {
                 continue;
             }
 
+            float collision_cylinder_sidewise_spread = 1.0f;
+
             const glm::vec3& cubePosition = collision_cube_positions[i];
-            float cubeMinX = cubePosition.x - 0.25f;
-            float cubeMaxX = cubePosition.x + 0.25f;
-            float cubeMinY = cubePosition.y - 0.25f;
-            float cubeMaxY = cubePosition.y + 0.25f;
-            float cubeMinZ = cubePosition.z - 0.25f;
-            float cubeMaxZ = cubePosition.z + 0.25f;
+            float cubeMinX = cubePosition.x - collision_cylinder_sidewise_spread;
+            float cubeMaxX = cubePosition.x + collision_cylinder_sidewise_spread;
+            float cubeMinY = cubePosition.y - collision_cylinder_sidewise_spread;
+            float cubeMaxY = cubePosition.y + collision_cylinder_sidewise_spread;
+            float cubeMinZ = cubePosition.z - 0.05f;
+            float cubeMaxZ = cubePosition.z + 0.05f; //should not consider collision before entering the circle.
 
             float planeMinX = PLANE_TRANSLATE_VECTOR.x - (PLANE_SIZE.x / 2);
             float planeMaxX = PLANE_TRANSLATE_VECTOR.x + (PLANE_SIZE.x / 2);
@@ -277,12 +326,29 @@ int main()
                 collided_cube_indices.push_back(i);
                 collision_cube_positions[i] = glm::vec3(10.0f, 10.0f, 100.0f); //remove from screen effect.
                 gSoundPlayer->requestPlay();
+
                 game_points++;
-                // Add your collision response here
+                
             }
+            //std::cout << "Distance Covered: " << distance_covered << std::endl;
         }
 
 
+
+        //Lamp Posts
+        glm::mat4 translateMatrix, scaleMatrix, rotateMatrix;
+        glBindTexture(GL_TEXTURE_2D, texture0);
+        
+        for (int i = 0; i < left_lamp_cube_positions.size(); i++) {
+            translateMatrix = glm::translate(identityMatrix, glm::vec3(2.0f, 0.0f, -0.7f));
+            LampPost(ourShader, translateMatrix, cubeVAO, left_building_cube_positions[i]);
+        }
+
+        for (int j = 0; j < right_lamp_cube_positions.size(); j++) {
+            translateMatrix = glm::translate(identityMatrix, glm::vec3(2.0f, 0.0f, -0.7f));
+            LampPost(ourShader, translateMatrix, cubeVAO, right_lamp_cube_positions[j]);
+        }
+        
 
 
         //prevent from going below the map
@@ -307,6 +373,7 @@ int main()
         if (isPlaneAtNPercent()) {
             updateMapNewZPosition();
 			generateNewBuildings(false);
+            generateNewLamps(false);
         }
 
         // we now draw as many light bulbs as we have point lights.
@@ -354,7 +421,8 @@ int main()
 
         //draw building
         drawBuildings(lightingShaderWithTexture);
-
+        updateFanRotation();
+        drawPlane(lightingShaderWithTexture, planeBodyCube, planeWingsCube, planeBladeCube);
 
         LOOP_ITER++;
 
@@ -377,6 +445,13 @@ int main()
 
     glfwTerminate();
     return 0;
+}
+
+void updateFanRotation() {
+    fanRotationAngle += 3.0f; // (degrees per frame)
+    if (fanRotationAngle >= 360.0f) {
+        fanRotationAngle -= 360.0f; // Keep angle within 0-360 deg
+    }
 }
 
 

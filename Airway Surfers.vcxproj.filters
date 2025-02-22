@@ -143,6 +143,9 @@
     <ClInclude Include="headers\building_location_generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\SoundPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="opengl\Include\imgui\imconfig.h">
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
@@ -153,6 +156,9 @@
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
     <ClInclude Include="opengl\Include\imgui\imgui_impl_opengl3.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\Include\imgui\imgui_impl_opengl3_loader.h">
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
     <ClInclude Include="opengl\Include\imgui\imgui_internal.h">
@@ -166,12 +172,6 @@
     </ClInclude>
     <ClInclude Include="opengl\Include\imgui\imstb_truetype.h">
       <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl\Include\imgui\imgui_impl_opengl3_loader.h">
-      <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\SoundPlayer.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -256,6 +256,15 @@
       <Filter>Resource Files\buildings</Filter>
     </Image>
     <Image Include="resources\buildings\g5.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+    <Image Include="..\..\..\OneDrive\Desktop\building_img\g6.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+    <Image Include="..\..\..\OneDrive\Desktop\building_img\g7.jpg">
+      <Filter>Resource Files\buildings</Filter>
+    </Image>
+    <Image Include="..\..\..\OneDrive\Desktop\building_img\g8.jpg">
       <Filter>Resource Files\buildings</Filter>
     </Image>
   </ItemGroup>
